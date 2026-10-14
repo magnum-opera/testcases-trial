@@ -26,5 +26,15 @@ export function createList() {
       items.push(item);
       return { item: { ...item } };
     },
+
+    // No default here: an emptied quantity is refused (TC-4.11).
+    changeQuantity(id, quantity) {
+      const item = items.find((candidate) => candidate.id === id);
+      if (!item) return { error: "Not found", notFound: true };
+      const judged = quantityRule(quantity);
+      if (judged.error) return judged;
+      item.quantity = judged.quantity;
+      return { item: { ...item } };
+    },
   };
 }

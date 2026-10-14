@@ -30,6 +30,13 @@ const server = createServer(async (req, res) => {
       const result = list.add(name, quantity);
       return result.error ? json(res, 400, result) : json(res, 201, result.item);
     }
+    const itemPath = req.url.match(/^\/api\/items\/(\d+)$/);
+    if (itemPath && req.method === "PATCH") {
+      const { quantity } = await body(req);
+      const result = list.changeQuantity(Number(itemPath[1]), quantity);
+      if (result.notFound) return json(res, 404, { error: "Not found" });
+      return result.error ? json(res, 400, result) : json(res, 200, result.item);
+    }
     json(res, 404, { error: "Not found" });
   } catch {
     json(res, 400, { error: "Bad request" });
