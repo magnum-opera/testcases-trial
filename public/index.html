@@ -8,6 +8,7 @@
     <h1>Shopping list</h1>
     <form id="add">
       <label>Item <input name="name" autocomplete="off" /></label>
+      <label>Quantity <input name="quantity" autocomplete="off" /></label>
       <button type="submit">Add</button>
     </form>
     <p id="error" role="alert"></p>
@@ -22,7 +23,7 @@
         items.replaceChildren(
           ...list.map((item) => {
             const li = document.createElement("li");
-            li.textContent = item.name;
+            li.textContent = `${item.name} × ${item.quantity}`;
             return li;
           }),
         );
@@ -33,7 +34,10 @@
         const res = await fetch("/api/items", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ name: form.elements.name.value }),
+          body: JSON.stringify({
+            name: form.elements.name.value,
+            quantity: form.elements.quantity.value,
+          }),
         });
         const result = await res.json();
         error.textContent = res.ok ? "" : result.error;
