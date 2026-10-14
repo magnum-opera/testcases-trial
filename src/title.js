@@ -6,8 +6,9 @@ export function createTitle(initial = "Shopping list") {
     get: () => name,
 
     set(next) {
-      if (next === "" || next == null) return { error: "Enter a list name" };
-      name = String(next).trim();
+      const trimmed = String(next ?? "").trim();
+      if (trimmed === "") return { error: "Enter a list name" };
+      name = trimmed;
       return { name };
     },
   };

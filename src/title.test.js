@@ -13,3 +13,9 @@ test("TC-16.2 An empty list name is refused", () => {
   assert.deepEqual(title.set(""), { error: "Enter a list name" });
   assert.equal(title.get(), "Shopping list");
 });
+
+test("TC-18.1 A list name of only spaces is refused", () => {
+  const title = createTitle();
+  assert.deepEqual(title.set(" "), { error: "Enter a list name" });
+  assert.equal(title.get(), "Shopping list");
+});
