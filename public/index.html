@@ -5,7 +5,11 @@
     <title>Shopping list</title>
   </head>
   <body>
-    <h1>Shopping list</h1>
+    <h1 id="title">Shopping list</h1>
+    <form id="rename">
+      <label>List name <input name="name" autocomplete="off" /></label>
+      <button type="submit">Rename</button>
+    </form>
     <form id="add">
       <label>Item <input name="name" autocomplete="off" /></label>
       <button type="submit">Add</button>
@@ -41,7 +45,28 @@
         await render();
       });
 
+      const rename = document.getElementById("rename");
+      const heading = document.getElementById("title");
+
+      async function renderTitle() {
+        heading.textContent = (await (await fetch("/api/title")).json()).name;
+      }
+
+      rename.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const res = await fetch("/api/title", {
+          method: "PUT",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ name: rename.elements.name.value }),
+        });
+        const result = await res.json();
+        error.textContent = res.ok ? "" : result.error;
+        if (res.ok) rename.reset();
+        await renderTitle();
+      });
+
       render();
+      renderTitle();
     </script>
   </body>
 </html>
