@@ -59,7 +59,7 @@ test("a changed quantity shows on the same item, in the same place", () => {
   const bread = list.add("Bread", "1").item;
   list.add("Eggs", "6");
   assert.deepEqual(list.changeQuantity(bread.id, "4"), {
-    item: { id: bread.id, name: "Bread", quantity: 4 },
+    item: { id: bread.id, name: "Bread", quantity: 4, ticked: false },
   });
   assert.deepEqual(shown(list), ["Milk × 2", "Bread × 4", "Eggs × 6"]);
 });
@@ -136,4 +136,51 @@ test("TC-4.2 An empty item name is refused whatever the quantity", () => {
     list.all().map(({ name, quantity }) => ({ name, quantity })),
     [{ name: "Milk", quantity: 2 }],
   );
+});
+
+test("an added item is not ticked", () => {
+  const list = createList();
+  assert.equal(list.add("Milk", "2").item.ticked, false);
+  assert.equal(list.all()[0].ticked, false);
+});
+
+test("ticking an item ticks it and keeps it the same, in the same place", () => {
+  const list = createList();
+  list.add("Milk", "2");
+  const bread = list.add("Bread", "1").item;
+  list.add("Eggs", "6");
+  assert.deepEqual(list.toggleTick(bread.id), {
+    item: { id: bread.id, name: "Bread", quantity: 1, ticked: true },
+  });
+  assert.deepEqual(
+    list.all().map(({ name, quantity, ticked }) => ({ name, quantity, ticked })),
+    [
+      { name: "Milk", quantity: 2, ticked: false },
+      { name: "Bread", quantity: 1, ticked: true },
+      { name: "Eggs", quantity: 6, ticked: false },
+    ],
+  );
+});
+
+test("ticking a ticked item again unticks it, in the same place", () => {
+  const list = createList();
+  list.add("Milk", "2");
+  const bread = list.add("Bread", "1").item;
+  list.toggleTick(bread.id);
+  assert.equal(list.toggleTick(bread.id).item.ticked, false);
+  assert.deepEqual(
+    list.all().map(({ name, ticked }) => ({ name, ticked })),
+    [
+      { name: "Milk", ticked: false },
+      { name: "Bread", ticked: false },
+    ],
+  );
+});
+
+test("ticking an unknown item is refused and leaves the list unchanged", () => {
+  const list = createList();
+  list.add("Milk", "2");
+  const before = list.all();
+  assert.ok(list.toggleTick(99).error);
+  assert.deepEqual(list.all(), before);
 });
