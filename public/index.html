@@ -25,6 +25,15 @@
             const li = document.createElement("li");
             const text = document.createElement("span");
             text.textContent = `${item.name} × ${item.quantity}`;
+            text.style.textDecorationLine = item.ticked ? "line-through" : "none";
+            const tick = document.createElement("input");
+            tick.type = "checkbox";
+            tick.checked = item.ticked;
+            tick.setAttribute("aria-label", text.textContent);
+            tick.addEventListener("change", async () => {
+              await fetch(`/api/items/${item.id}/tick`, { method: "POST" });
+              await render();
+            });
             const change = document.createElement("form");
             const field = document.createElement("input");
             field.setAttribute("aria-label", "Quantity");
@@ -45,7 +54,7 @@
               error.textContent = res.ok ? "" : result.error;
               await render();
             });
-            li.append(text, " ", change);
+            li.append(tick, text, " ", change);
             return li;
           }),
         );

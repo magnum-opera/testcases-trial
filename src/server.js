@@ -37,6 +37,11 @@ const server = createServer(async (req, res) => {
       if (result.notFound) return json(res, 404, { error: "Not found" });
       return result.error ? json(res, 400, result) : json(res, 200, result.item);
     }
+    const tickPath = req.url.match(/^\/api\/items\/(\d+)\/tick$/);
+    if (tickPath && req.method === "POST") {
+      const result = list.toggleTick(Number(tickPath[1]));
+      return result.error ? json(res, 404, { error: "Not found" }) : json(res, 200, result.item);
+    }
     json(res, 404, { error: "Not found" });
   } catch {
     json(res, 400, { error: "Bad request" });

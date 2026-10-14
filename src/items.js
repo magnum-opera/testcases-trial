@@ -22,7 +22,7 @@ export function createList() {
       if (trimmed === "") return { error: "Enter an item name" };
       const judged = quantity === undefined || quantity === "" ? { quantity: 1 } : quantityRule(quantity);
       if (judged.error) return judged;
-      const item = { id: nextId++, name: trimmed, quantity: judged.quantity };
+      const item = { id: nextId++, name: trimmed, quantity: judged.quantity, ticked: false };
       items.push(item);
       return { item: { ...item } };
     },
@@ -34,6 +34,13 @@ export function createList() {
       const judged = quantityRule(quantity);
       if (judged.error) return judged;
       item.quantity = judged.quantity;
+      return { item: { ...item } };
+    },
+
+    toggleTick(id) {
+      const item = items.find((candidate) => candidate.id === id);
+      if (!item) return { error: "Not found" };
+      item.ticked = !item.ticked;
       return { item: { ...item } };
     },
   };
