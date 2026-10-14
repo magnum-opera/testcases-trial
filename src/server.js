@@ -1,10 +1,8 @@
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { createList } from "./items.js";
-import { createTitle } from "./title.js";
 
 const list = createList();
-const title = createTitle();
 const page = new URL("../public/index.html", import.meta.url);
 
 async function body(req) {
@@ -30,13 +28,6 @@ const server = createServer(async (req, res) => {
     if (req.url === "/api/items" && req.method === "POST") {
       const result = list.add((await body(req)).name);
       return result.error ? json(res, 400, result) : json(res, 201, result.item);
-    }
-    if (req.url === "/api/title" && req.method === "GET") {
-      return json(res, 200, { name: title.get() });
-    }
-    if (req.url === "/api/title" && req.method === "PUT") {
-      const result = title.set((await body(req)).name);
-      return result.error ? json(res, 400, result) : json(res, 200, result);
     }
     json(res, 404, { error: "Not found" });
   } catch {
