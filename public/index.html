@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Shopping list</title>
+  </head>
+  <body>
+    <h1>Shopping list</h1>
+    <form id="add">
+      <label>Item <input name="name" autocomplete="off" /></label>
+      <button type="submit">Add</button>
+    </form>
+    <p id="error" role="alert"></p>
+    <ul id="items"></ul>
+    <script>
+      const form = document.getElementById("add");
+      const error = document.getElementById("error");
+      const items = document.getElementById("items");
+
+      async function render() {
+        const list = await (await fetch("/api/items")).json();
+        items.replaceChildren(
+          ...list.map((item) => {
+            const li = document.createElement("li");
+            li.textContent = item.name;
+            return li;
+          }),
+        );
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const res = await fetch("/api/items", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ name: form.elements.name.value }),
+        });
+        const result = await res.json();
+        error.textContent = res.ok ? "" : result.error;
+        if (res.ok) form.reset();
+        await render();
+      });
+
+      render();
+    </script>
+  </body>
+</html>

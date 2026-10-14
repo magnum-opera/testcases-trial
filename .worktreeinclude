@@ -1,0 +1,2 @@
+# A cold checkout needs no ignored file; the Setup command installs the rest.
+!.claude/worktrees/**

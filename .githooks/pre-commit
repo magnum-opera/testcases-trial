@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Runs the unit tests a commit touches: each staged test, and the test beside each staged source file.
+# Every run is logged with the staged tree, outside the working tree, so a commit the hook never saw shows.
+set -uo pipefail
+
+log="$(git rev-parse --path-format=absolute --git-common-dir)/pre-commit.log"
+tree=$(git write-tree)
+
+tests=()
+while IFS= read -r f; do
+  case "$f" in
+    src/*.test.js) t="$f" ;;
+    src/*.js) t="${f%.js}.test.js" ;;
+    *) continue ;;
+  esac
+  [ -f "$t" ] && [[ " ${tests[*]-} " != *" $t "* ]] && tests+=("$t")
+done < <(git diff --cached --name-only --diff-filter=ACMR)
+
+if [ ${#tests[@]} -eq 0 ]; then
+  echo "$(date -u +%FT%TZ) tree=$tree result=pass tests=none" >>"$log"
+  exit 0
+fi
+
+node --test "${tests[@]}"
+status=$?
+result=$([ $status -eq 0 ] && echo pass || echo fail)
+echo "$(date -u +%FT%TZ) tree=$tree result=$result tests=${tests[*]}" >>"$log"
+exit $status
