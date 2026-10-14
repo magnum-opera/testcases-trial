@@ -1,3 +1,14 @@
+const QUANTITY_ERROR = "Quantity must be a whole number from 1 to 99";
+
+// Judges the written form, not Number(): "2.0" must be refused. Refuses "" too; #7 reuses it.
+function quantityRule(value) {
+  const written = String(value ?? "");
+  if (!/^\d+$/.test(written)) return { error: QUANTITY_ERROR };
+  const quantity = Number(written);
+  if (quantity < 1 || quantity > 99) return { error: QUANTITY_ERROR };
+  return { quantity };
+}
+
 // The shopping list, held in memory for the life of the server.
 export function createList() {
   const items = [];
@@ -6,10 +17,12 @@ export function createList() {
   return {
     all: () => items.map((item) => ({ ...item })),
 
-    add(name) {
+    add(name, quantity) {
       const trimmed = String(name ?? "").trim();
       if (trimmed === "") return { error: "Enter an item name" };
-      const item = { id: nextId++, name: trimmed };
+      const judged = quantity === undefined || quantity === "" ? { quantity: 1 } : quantityRule(quantity);
+      if (judged.error) return judged;
+      const item = { id: nextId++, name: trimmed, quantity: judged.quantity };
       items.push(item);
       return { item: { ...item } };
     },

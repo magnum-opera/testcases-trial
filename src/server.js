@@ -26,7 +26,8 @@ const server = createServer(async (req, res) => {
       return json(res, 200, list.all());
     }
     if (req.url === "/api/items" && req.method === "POST") {
-      const result = list.add((await body(req)).name);
+      const { name, quantity } = await body(req);
+      const result = list.add(name, quantity);
       return result.error ? json(res, 400, result) : json(res, 201, result.item);
     }
     json(res, 404, { error: "Not found" });
