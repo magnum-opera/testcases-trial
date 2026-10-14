@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../fixtures";
 
 test("TC-2.1 An added item appears at the bottom of the list", { tag: ["@REQ-2.1", "@high"] }, async ({ page }) => {
   await page.goto("/");

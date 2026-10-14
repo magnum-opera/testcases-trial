@@ -6,7 +6,7 @@ A shopping list: a Node HTTP server (`src/server.js`) serving one page (`public/
 
 - `npm ci`: install. It also points git at `.githooks/`.
 - `npm run check`: the unit tests, `node --test` over `src/**/*.test.js`.
-- `npm run e2e`: the end-to-end tests, Playwright under `e2e/`. It starts the server itself on `E2E_PORT` (default 4173), so it needs no stack brought up first.
+- `npm run e2e`: the end-to-end tests, Playwright under `e2e/`. Each test starts its own server on a free port (`e2e/fixtures.ts`), so every test begins from an empty list and needs no stack brought up first.
 - The pre-commit hook runs the unit tests a commit touches.
 
 ## Agent skills
